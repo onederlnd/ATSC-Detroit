@@ -1,0 +1,12 @@
+# Adaptive Traffic Signal Control — Python Dependencies
+# Install with: pip install -r requirements.txt
+# SUMO itself must be installed separately: https://sumo.dlr.de/docs/Installing/index.html
+
+gymnasium>=0.29.0
+stable-baselines3>=2.3.0
+numpy>=1.26.0
+tensorboard>=2.16.0        # For training visualization
+
+# Optional: sumo-rl wraps SUMO/TraCI into a Gym env for multi-intersection setups
+# Useful reference but we build our own env above for full control
+# sumo-rl>=1.4.5

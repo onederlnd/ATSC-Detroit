@@ -1,0 +1,51 @@
+<!--
+    intersection.sumocfg
+    ---------------------
+    Master SUMO configuration. References all input files and sets
+    simulation parameters.
+
+    Run headless:  sumo -c intersection.sumocfg
+    Run with GUI:  sumo-gui -c intersection.sumocfg
+-->
+
+<configuration>
+
+    <input>
+        <!-- Road network -->
+        <net-file value="intersection.net.xml"/>
+
+        <!-- Vehicle demand -->
+        <route-files value="routes.rou.xml"/>
+
+        <!-- Inductive loop detectors (generated separately — see below) -->
+        <additional-files value="detectors.add.xml"/>
+    </input>
+
+    <time>
+        <!-- Simulate 1 hour (3600 seconds) -->
+        <begin value="0"/>
+        <end value="3600"/>
+        <step-length value="1.0"/>
+    </time>
+
+    <processing>
+        <!-- Teleport vehicles stuck >300s (prevents gridlock in sim) -->
+        <time-to-teleport value="300"/>
+        <!-- Collision handling -->
+        <collision.action value="warn"/>
+    </processing>
+
+    <output>
+        <!-- Summary stats output — useful for baseline comparisons -->
+        <summary-output value="output/summary.xml"/>
+        <!-- Per-vehicle trip info — waiting time, travel time, etc. -->
+        <tripinfo-output value="output/tripinfo.xml"/>
+    </output>
+
+    <gui_only>
+        <!-- Default zoom/view when opening sumo-gui -->
+        <start value="1"/>
+        <delay value="50"/>
+    </gui_only>
+
+</configuration>

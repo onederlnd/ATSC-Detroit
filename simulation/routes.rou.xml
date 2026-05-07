@@ -1,0 +1,89 @@
+<!--
+    routes.rou.xml
+    --------------
+    Defines vehicle types, routes through the intersection, and traffic demand.
+
+    Demand model: moderate urban intersection
+      - N/S corridor is the "main" road (higher volume)
+      - E/W is the "cross" road (lower volume)
+      - Includes a realistic mix of through traffic + turns
+
+    vehsPerHour numbers are starting points — tune these to match
+    real counts from your target intersection if you have them.
+    A traffic study or city traffic data portal is the best source.
+-->
+
+<routes>
+
+    <!-- ============================================================
+         VEHICLE TYPE
+         Standard passenger car. Adjust for trucks, buses, etc. later.
+    ============================================================ -->
+    <vType id="car"
+           accel="2.6"
+           decel="4.5"
+           sigma="0.5"
+           length="5"
+           minGap="2.5"
+           maxSpeed="13.89"
+           guiShape="passenger"/>
+
+    <!-- ============================================================
+         ROUTES
+         Each route is a sequence of edge IDs a vehicle travels.
+    ============================================================ -->
+
+    <!-- N/S through traffic -->
+    <route id="south_thru" edges="south_to_center center_to_north"/>
+    <route id="north_thru" edges="north_to_center center_to_south"/>
+
+    <!-- E/W through traffic -->
+    <route id="west_thru"  edges="west_to_center center_to_east"/>
+    <route id="east_thru"  edges="east_to_center center_to_west"/>
+
+    <!-- Right turns -->
+    <route id="south_right" edges="south_to_center center_to_east"/>
+    <route id="north_right" edges="north_to_center center_to_west"/>
+    <route id="west_right"  edges="west_to_center center_to_north"/>
+    <route id="east_right"  edges="east_to_center center_to_south"/>
+
+    <!-- Left turns (lower volume — more complex maneuver) -->
+    <route id="south_left" edges="south_to_center center_to_west"/>
+    <route id="north_left" edges="north_to_center center_to_east"/>
+    <route id="west_left"  edges="west_to_center center_to_south"/>
+    <route id="east_left"  edges="east_to_center center_to_north"/>
+
+    <!-- ============================================================
+         FLOWS
+         Continuous vehicle generation over the simulation period.
+         begin/end = simulation seconds.
+         vehsPerHour = demand level — adjust to model peak/off-peak.
+
+         Scenario below: moderate peak-hour load
+           N/S main road: ~600 veh/hr through, ~100 turns each way
+           E/W cross road: ~400 veh/hr through, ~75 turns each way
+    ============================================================ -->
+
+    <!-- Simulation runs 3600s (1 hr). Demand ramps: light → peak → light -->
+
+    <!-- N/S main corridor — southbound approach (vehicles from north) -->
+    <flow id="f_north_thru"  route="north_thru"  begin="0"    end="3600" vehsPerHour="600" type="car" departLane="0" departSpeed="max"/>
+    <flow id="f_north_right" route="north_right" begin="0"    end="3600" vehsPerHour="100" type="car" departLane="1" departSpeed="max"/>
+    <flow id="f_north_left"  route="north_left"  begin="0"    end="3600" vehsPerHour="75"  type="car" departLane="0" departSpeed="max"/>
+
+    <!-- N/S main corridor — northbound approach (vehicles from south) -->
+    <flow id="f_south_thru"  route="south_thru"  begin="0"    end="3600" vehsPerHour="600" type="car" departLane="0" departSpeed="max"/>
+    <flow id="f_south_right" route="south_right" begin="0"    end="3600" vehsPerHour="100" type="car" departLane="1" departSpeed="max"/>
+    <flow id="f_south_left"  route="south_left"  begin="0"    end="3600" vehsPerHour="75"  type="car" departLane="0" departSpeed="max"/>
+
+    <!-- E/W cross road — eastbound approach (vehicles from west) -->
+    <flow id="f_west_thru"   route="west_thru"   begin="0"    end="3600" vehsPerHour="400" type="car" departLane="0" departSpeed="max"/>
+    <flow id="f_west_right"  route="west_right"  begin="0"    end="3600" vehsPerHour="75"  type="car" departLane="1" departSpeed="max"/>
+    <flow id="f_west_left"   route="west_left"   begin="0"    end="3600" vehsPerHour="50"  type="car" departLane="0" departSpeed="max"/>
+
+    <!-- E/W cross road — westbound approach (vehicles from east) -->
+    <flow id="f_east_thru"   route="east_thru"   begin="0"    end="3600" vehsPerHour="400" type="car" departLane="0" departSpeed="max"/>
+    <flow id="f_east_right"  route="east_right"  begin="0"    end="3600" vehsPerHour="75"  type="car" departLane="1" departSpeed="max"/>
+    <flow id="f_east_left"   route="east_left"   begin="0"    end="3600" vehsPerHour="50"  type="car" departLane="0" departSpeed="max"/>
+
+</routes>
