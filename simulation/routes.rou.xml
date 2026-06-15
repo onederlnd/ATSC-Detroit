@@ -1,89 +1,152 @@
 <!--
     routes.rou.xml
-    --------------
-    Defines vehicle types, routes through the intersection, and traffic demand.
+    Michigan Ave & Livernois, Detroit
+    
+    Demand calibrated from MDOT AADT estimates for Michigan Ave (~20,000 vpd)
+    and Livernois (~10,000 vpd) using standard K-factor (peak hour = 9% of AADT).
 
-    Demand model: moderate urban intersection
-      - N/S corridor is the "main" road (higher volume)
-      - E/W is the "cross" road (lower volume)
-      - Includes a realistic mix of through traffic + turns
+    Three demand periods modeled:
+        AM Peak  : 7-9 AM   (steps 0-7200)
+        Off-Peak : 9AM-4PM  (steps 7200-57600)
+        PM Peak  : 4-6 PM   (steps 57600-64800)
 
-    vehsPerHour numbers are starting points — tune these to match
-    real counts from your target intersection if you have them.
-    A traffic study or city traffic data portal is the best source.
+    Directional splits:
+        Michigan Ave: 55% westbound / 45% eastbound (AM), reversed for PM
+        Livernois:    50% northbound / 50% southbound
+
+    Edge IDs match the netgenerate grid network:
+        Michigan Ave (E-W): A0B0, B0A0
+        Livernois   (N-S): A0A1, A1A0
 -->
 
 <routes>
 
-    <!-- ============================================================
-         VEHICLE TYPE
-         Standard passenger car. Adjust for trucks, buses, etc. later.
-    ============================================================ -->
+    <!-- Vehicle type — representative Detroit urban mixed fleet -->
     <vType id="car"
            accel="2.6"
            decel="4.5"
            sigma="0.5"
            length="5"
-           minGap="2.5"
            maxSpeed="13.89"
-           guiShape="passenger"/>
+           color="0.7,0.7,0.7"/>
 
-    <!-- ============================================================
-         ROUTES
-         Each route is a sequence of edge IDs a vehicle travels.
-    ============================================================ -->
+    <!-- Routes — one per direction through the A0 intersection -->
+     <route id="mich_wb" edges="A1A0 A0B0"/>
+     <route id="mich_eb" edges="B0A0 A0A1"/>
+     <route id="liv_nb"  edges="B1B0 B0A0"/>
+     <route id="liv_sb"  edges="A0A1 A1B1"/>
+    <!-- ================================================================ -->
+    <!-- AM PEAK: 7-9 AM (simulation steps 0-7200)                        -->
+    <!-- Michigan Ave: 1800 veh/hr total, 55% WB / 45% EB                 -->
+    <!-- Livernois:     900 veh/hr total, 50% NB / 50% SB                 -->
+    <!-- ================================================================ -->
 
-    <!-- N/S through traffic -->
-    <route id="south_thru" edges="south_to_center center_to_north"/>
-    <route id="north_thru" edges="north_to_center center_to_south"/>
+    <!-- Michigan Ave westbound AM: 990 veh/hr -->
+    <flow id="am_mich_wb"
+          type="car"
+          route="mich_wb"
+          begin="0"
+          end="7200"
+          vehsPerHour="990"/>
 
-    <!-- E/W through traffic -->
-    <route id="west_thru"  edges="west_to_center center_to_east"/>
-    <route id="east_thru"  edges="east_to_center center_to_west"/>
+    <!-- Michigan Ave eastbound AM: 810 veh/hr -->
+    <flow id="am_mich_eb"
+          type="car"
+          route="mich_eb"
+          begin="0"
+          end="7200"
+          vehsPerHour="810"/>
 
-    <!-- Right turns -->
-    <route id="south_right" edges="south_to_center center_to_east"/>
-    <route id="north_right" edges="north_to_center center_to_west"/>
-    <route id="west_right"  edges="west_to_center center_to_north"/>
-    <route id="east_right"  edges="east_to_center center_to_south"/>
+    <!-- Livernois northbound AM: 450 veh/hr -->
+    <flow id="am_liv_nb"
+          type="car"
+          route="liv_nb"
+          begin="0"
+          end="7200"
+          vehsPerHour="450"/>
 
-    <!-- Left turns (lower volume — more complex maneuver) -->
-    <route id="south_left" edges="south_to_center center_to_west"/>
-    <route id="north_left" edges="north_to_center center_to_east"/>
-    <route id="west_left"  edges="west_to_center center_to_south"/>
-    <route id="east_left"  edges="east_to_center center_to_north"/>
+    <!-- Livernois southbound AM: 450 veh/hr -->
+    <flow id="am_liv_sb"
+          type="car"
+          route="liv_sb"
+          begin="0"
+          end="7200"
+          vehsPerHour="450"/>
 
-    <!-- ============================================================
-         FLOWS
-         Continuous vehicle generation over the simulation period.
-         begin/end = simulation seconds.
-         vehsPerHour = demand level — adjust to model peak/off-peak.
+    <!-- ================================================================ -->
+    <!-- OFF-PEAK: 9 AM - 4 PM (simulation steps 7200-57600)              -->
+    <!-- Michigan Ave: 800 veh/hr total, 50/50 split                      -->
+    <!-- Livernois:    400 veh/hr total, 50/50 split                      -->
+    <!-- ================================================================ -->
 
-         Scenario below: moderate peak-hour load
-           N/S main road: ~600 veh/hr through, ~100 turns each way
-           E/W cross road: ~400 veh/hr through, ~75 turns each way
-    ============================================================ -->
+    <!-- Michigan Ave westbound off-peak: 400 veh/hr -->
+    <flow id="op_mich_wb"
+          type="car"
+          route="mich_wb"
+          begin="7200"
+          end="57600"
+          vehsPerHour="400"/>
 
-    <!-- Simulation runs 3600s (1 hr). Demand ramps: light → peak → light -->
+    <!-- Michigan Ave eastbound off-peak: 400 veh/hr -->
+    <flow id="op_mich_eb"
+          type="car"
+          route="mich_eb"
+          begin="7200"
+          end="57600"
+          vehsPerHour="400"/>
 
-    <!-- N/S main corridor — southbound approach (vehicles from north) -->
-    <flow id="f_north_thru"  route="north_thru"  begin="0"    end="3600" vehsPerHour="600" type="car" departLane="0" departSpeed="max"/>
-    <flow id="f_north_right" route="north_right" begin="0"    end="3600" vehsPerHour="100" type="car" departLane="1" departSpeed="max"/>
-    <flow id="f_north_left"  route="north_left"  begin="0"    end="3600" vehsPerHour="75"  type="car" departLane="0" departSpeed="max"/>
+    <!-- Livernois northbound off-peak: 200 veh/hr -->
+    <flow id="op_liv_nb"
+          type="car"
+          route="liv_nb"
+          begin="7200"
+          end="57600"
+          vehsPerHour="200"/>
 
-    <!-- N/S main corridor — northbound approach (vehicles from south) -->
-    <flow id="f_south_thru"  route="south_thru"  begin="0"    end="3600" vehsPerHour="600" type="car" departLane="0" departSpeed="max"/>
-    <flow id="f_south_right" route="south_right" begin="0"    end="3600" vehsPerHour="100" type="car" departLane="1" departSpeed="max"/>
-    <flow id="f_south_left"  route="south_left"  begin="0"    end="3600" vehsPerHour="75"  type="car" departLane="0" departSpeed="max"/>
+    <!-- Livernois southbound off-peak: 200 veh/hr -->
+    <flow id="op_liv_sb"
+          type="car"
+          route="liv_sb"
+          begin="7200"
+          end="57600"
+          vehsPerHour="200"/>
 
-    <!-- E/W cross road — eastbound approach (vehicles from west) -->
-    <flow id="f_west_thru"   route="west_thru"   begin="0"    end="3600" vehsPerHour="400" type="car" departLane="0" departSpeed="max"/>
-    <flow id="f_west_right"  route="west_right"  begin="0"    end="3600" vehsPerHour="75"  type="car" departLane="1" departSpeed="max"/>
-    <flow id="f_west_left"   route="west_left"   begin="0"    end="3600" vehsPerHour="50"  type="car" departLane="0" departSpeed="max"/>
+    <!-- ================================================================ -->
+    <!-- PM PEAK: 4-6 PM (simulation steps 57600-64800)                   -->
+    <!-- Michigan Ave: 2000 veh/hr total, 45% WB / 55% EB (reversed AM)  -->
+    <!-- Livernois:    1000 veh/hr total, 50/50 split                     -->
+    <!-- ================================================================ -->
 
-    <!-- E/W cross road — westbound approach (vehicles from east) -->
-    <flow id="f_east_thru"   route="east_thru"   begin="0"    end="3600" vehsPerHour="400" type="car" departLane="0" departSpeed="max"/>
-    <flow id="f_east_right"  route="east_right"  begin="0"    end="3600" vehsPerHour="75"  type="car" departLane="1" departSpeed="max"/>
-    <flow id="f_east_left"   route="east_left"   begin="0"    end="3600" vehsPerHour="50"  type="car" departLane="0" departSpeed="max"/>
+    <!-- Michigan Ave westbound PM: 900 veh/hr -->
+    <flow id="pm_mich_wb"
+          type="car"
+          route="mich_wb"
+          begin="57600"
+          end="64800"
+          vehsPerHour="900"/>
+
+    <!-- Michigan Ave eastbound PM: 1100 veh/hr -->
+    <flow id="pm_mich_eb"
+          type="car"
+          route="mich_eb"
+          begin="57600"
+          end="64800"
+          vehsPerHour="1100"/>
+
+    <!-- Livernois northbound PM: 500 veh/hr -->
+    <flow id="pm_liv_nb"
+          type="car"
+          route="liv_nb"
+          begin="57600"
+          end="64800"
+          vehsPerHour="500"/>
+
+    <!-- Livernois southbound PM: 500 veh/hr -->
+    <flow id="pm_liv_sb"
+          type="car"
+          route="liv_sb"
+          begin="57600"
+          end="64800"
+          vehsPerHour="500"/>
 
 </routes>

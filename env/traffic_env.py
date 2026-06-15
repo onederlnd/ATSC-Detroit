@@ -24,8 +24,7 @@ from gymnasium import spaces
 # SUMO_HOME must be set in your environment (e.g. /usr/share/sumo or /opt/homebrew/opt/sumo)
 if "SUMO_HOME" not in os.environ:
     raise EnvironmentError(
-        "SUMO_HOME is not set. "
-        "Install SUMO and set: export SUMO_HOME=/path/to/sumo"
+        "SUMO_HOME is not set. Install SUMO and set: export SUMO_HOME=/path/to/sumo"
     )
 
 tools_path = os.path.join(os.environ["SUMO_HOME"], "tools")
@@ -40,10 +39,12 @@ import traci  # noqa: E402 — must come after sys.path update
 # ---------------------------------------------------------------------------
 
 # Path to your SUMO config file
-SUMO_CFG = os.path.join(os.path.dirname(__file__), "..", "simulation", "intersection.sumocfg")
+SUMO_CFG = os.path.join(
+    os.path.dirname(__file__), "..", "simulation", "intersection.sumocfg"
+)
 
 # The traffic light ID in your SUMO network (check your .net.xml)
-TL_ID = "TL_0"
+TL_ID = "A0"
 
 # How many signal phases your intersection has (e.g. 4 for a basic 4-way)
 NUM_PHASES = 4
@@ -64,8 +65,8 @@ STEP_LENGTH = 1.0
 MAX_STEPS = 3600  # 1 simulated hour
 
 # Min/max green time per phase (safety constraints — real controllers enforce these)
-MIN_GREEN_STEPS = 10   # 10 seconds minimum green
-MAX_GREEN_STEPS = 60   # 60 seconds maximum green
+MIN_GREEN_STEPS = 10  # 10 seconds minimum green
+MAX_GREEN_STEPS = 60  # 60 seconds maximum green
 
 # Yellow phase duration (fixed — not controlled by AI)
 YELLOW_STEPS = 4
@@ -74,6 +75,7 @@ YELLOW_STEPS = 4
 # ---------------------------------------------------------------------------
 # Environment
 # ---------------------------------------------------------------------------
+
 
 class TrafficSignalEnv(gym.Env):
     """
@@ -159,7 +161,10 @@ class TrafficSignalEnv(gym.Env):
 
         # --- Phase transition logic ---
         if not self._in_yellow:
-            if action != self._current_phase and self._phase_step_count >= MIN_GREEN_STEPS:
+            if (
+                action != self._current_phase
+                and self._phase_step_count >= MIN_GREEN_STEPS
+            ):
                 # Start yellow transition
                 self._in_yellow = True
                 self._yellow_step_count = 0
@@ -228,10 +233,13 @@ class TrafficSignalEnv(gym.Env):
         binary = "sumo-gui" if self.use_gui else "sumo"
         sumo_cmd = [
             binary,
-            "-c", SUMO_CFG,
-            "--step-length", str(STEP_LENGTH),
-            "--no-warnings",          # Suppress SUMO console noise
-            "--waiting-time-memory", "1000",
+            "-c",
+            SUMO_CFG,
+            "--step-length",
+            str(STEP_LENGTH),
+            "--no-warnings",  # Suppress SUMO console noise
+            "--waiting-time-memory",
+            "1000",
         ]
         traci.start(sumo_cmd)
         self._sumo_running = True
@@ -245,7 +253,7 @@ class TrafficSignalEnv(gym.Env):
         for det_id in DETECTOR_IDS:
             try:
                 # getLastStepHaltingNumber: vehicles stopped at detector
-                halted = traci.inductionloop.getLastStepHaltingNumber(det_id)
+                halted = traci.inductionloop.getLastStepVehicleNumber(det_id)
             except traci.exceptions.TraCIException:
                 halted = 0
             queues.append(min(halted / max_queue, 1.0))
@@ -265,7 +273,7 @@ class TrafficSignalEnv(gym.Env):
         total = 0
         for det_id in DETECTOR_IDS:
             try:
-                total += traci.inductionloop.getLastStepHaltingNumber(det_id)
+                total += traci.inductionloop.getLastStepVehicleNumber(det_id)
             except traci.exceptions.TraCIException:
                 pass
         return total
@@ -276,11 +284,11 @@ class TrafficSignalEnv(gym.Env):
         In SUMO, yellow phases are typically interleaved between green phases.
         This is a simplified approach — production systems use explicit yellow phase IDs.
         """
-        # A common SUMO convention: yellow phase = current_phase * 2 + 1
-        # Adjust based on your actual phase structure in the .net.xml
-        yellow_phase_id = self._current_phase * 2 + 1
-        try:
-            traci.trafficlight.setPhase(TL_ID, yellow_phase_id)
-        except traci.exceptions.TraCIException:
-            # Fallback: just hold current phase if yellow phase ID doesn't exist
-            pass
+        ## A common SUMO convention: yellow phase = current_phase * 2 + 1
+        ## Adjust based on your actual phase structure in the .net.xml
+        # yellow_phase_id = self._current_phase * 2 + 1
+        # try:
+        #    traci.trafficlight.setPhase(TL_ID, yellow_phase_id)
+        # except traci.exceptions.TraCIException:
+        #    # Fallback: just hold current phase if yellow phase ID doesn't exist
+        pass

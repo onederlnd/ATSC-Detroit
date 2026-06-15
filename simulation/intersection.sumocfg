@@ -1,6 +1,5 @@
 <!--
     intersection.sumocfg
-    ---------------------
     Master SUMO configuration. References all input files and sets
     simulation parameters.
 
@@ -17,7 +16,7 @@
         <!-- Vehicle demand -->
         <route-files value="routes.rou.xml"/>
 
-        <!-- Inductive loop detectors (generated separately — see below) -->
+        <!-- Inductive loop detectors (generated separately - see below) -->
         <additional-files value="detectors.add.xml"/>
     </input>
 
@@ -36,9 +35,9 @@
     </processing>
 
     <output>
-        <!-- Summary stats output — useful for baseline comparisons -->
+        <!-- Summary stats output - useful for baseline comparisons -->
         <summary-output value="output/summary.xml"/>
-        <!-- Per-vehicle trip info — waiting time, travel time, etc. -->
+        <!-- Per-vehicle trip info - waiting time, travel time, etc. -->
         <tripinfo-output value="output/tripinfo.xml"/>
     </output>
 

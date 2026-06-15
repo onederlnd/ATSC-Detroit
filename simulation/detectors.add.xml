@@ -1,6 +1,5 @@
 <!--
     detectors.add.xml
-    -----------------
     Inductive loop detectors placed on each approach lane ~10m before
     the stop line. These are what traffic_env.py reads via TraCI to
     build the observation vector.
@@ -16,33 +15,27 @@
 -->
 
 <additional>
-
-    <!-- Northbound approach (vehicles coming from south endpoint) -->
     <inductionLoop id="det_south_in"
-                   lane="south_to_center_0"
-                   pos="-10"
+                   lane="A0A1_0"
+                   pos="10"
                    freq="1"
                    file="output/det_south_in.xml"/>
 
-    <!-- Southbound approach (vehicles coming from north endpoint) -->
     <inductionLoop id="det_north_in"
-                   lane="north_to_center_0"
-                   pos="-10"
+                   lane="A1A0_0"
+                   pos="10"
                    freq="1"
                    file="output/det_north_in.xml"/>
 
-    <!-- Eastbound approach (vehicles coming from west endpoint) -->
     <inductionLoop id="det_west_in"
-                   lane="west_to_center_0"
-                   pos="-10"
+                   lane="B0A0_0"
+                   pos="10"
                    freq="1"
                    file="output/det_west_in.xml"/>
 
-    <!-- Westbound approach (vehicles coming from east endpoint) -->
     <inductionLoop id="det_east_in"
-                   lane="east_to_center_0"
-                   pos="-10"
+                   lane="A0B0_0"
+                   pos="10"
                    freq="1"
                    file="output/det_east_in.xml"/>
-
 </additional>

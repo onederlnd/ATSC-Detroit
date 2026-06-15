@@ -6,7 +6,8 @@ gymnasium>=0.29.0
 stable-baselines3>=2.3.0
 numpy>=1.26.0
 tensorboard>=2.16.0        # For training visualization
-
+matplotlib
+pytest>=4.15.0
 # Optional: sumo-rl wraps SUMO/TraCI into a Gym env for multi-intersection setups
 # Useful reference but we build our own env above for full control
 # sumo-rl>=1.4.5
